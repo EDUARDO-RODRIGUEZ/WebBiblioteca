@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { Link } from 'react-router-dom';
 import svgwave from '../../../assets/wave.svg';
 import { usuarioContext } from '../../../context/usuarioContext';
 
@@ -74,6 +75,12 @@ const Register = () => {
                 name={"perfil"}
                 accept="image/*"
               />
+            </div>
+
+            <div className={"text-center my-2 hover:underline "}>
+              <Link to={"/auth/login"}>
+                <small>¿Ya tienes cuenta? Login</small>
+              </Link>
             </div>
 
             <div className={"px-4 mt-5"}>
