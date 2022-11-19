@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { Animated } from 'react-animated-css';
+import { Link } from 'react-router-dom';
 import { usuarioContext } from '../../../../context/usuarioContext';
 import useForm from '../../../../hooks/useForm';
 
@@ -50,6 +51,12 @@ const FormData = (props) => {
                             minLength={8}
                             required
                         />
+                    </div>
+
+                    <div className={"text-center my-2 hover:underline "}>
+                        <Link to={"/auth/register"}>
+                            <small>¿No tienes cuenta? Register</small>
+                        </Link>
                     </div>
 
                     <div className={"px-4 mt-3"}>

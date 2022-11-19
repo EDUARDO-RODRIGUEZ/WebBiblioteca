@@ -68,19 +68,43 @@ export const UsuarioContextProvider = ({ children }) => {
         payload: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, perfil: usuario.perfil }
       });
       callback(true);
-      
+
     } catch (error) {
       console.log(error);
       callback(false);
     }
+  }
 
+  async function compareFace(fileImage, perfil, callback) {
+    try {
+      const form = new FormData();
+      form.append("perfil", perfil);
+      form.append("photo", fileImage);
+      const { data } = await apiServiceAuth.post(`/usuario/compare`, form);
+
+      if (!data.compare) {
+        callback(false, "Face Invalid");
+        return;
+      }
+
+      dispatch({
+        type: types.UsuarioLogin,
+        payload: { isAuthenticated: true }
+      });
+
+      callback(true, "");
+    } catch (error) {
+      console.log(error)
+      callback(false, "");
+    }
   }
 
   return (
     <usuarioContext.Provider value={{
       state,
       login,
-      register
+      register,
+      compareFace
     }}>
       {children}
     </usuarioContext.Provider>

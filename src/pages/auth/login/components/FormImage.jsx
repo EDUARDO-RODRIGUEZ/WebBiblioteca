@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useContext } from 'react'
 import { Animated } from 'react-animated-css'
 import Webcam from "react-webcam";
 import perfil from '../../../../assets/perfil.png';
+import { usuarioContext } from '../../../../context/usuarioContext';
 import { dataURItoBlob } from '../../../../helpers/helper';
 
 const videoConstraints = {
@@ -10,21 +11,57 @@ const videoConstraints = {
 
 const FormImage = () => {
 
+    const { compareFace, state } = useContext(usuarioContext);
+
     const [play, setPlay] = useState(false);
     const webcamRef = useRef(null);
     const imageRef = useRef(null);
-
     const [file, setfile] = useState(null);
 
+
     const capture = useCallback(() => {
+        setPlay((p) => !p);
         const imageSrc = webcamRef.current.getScreenshot();
         imageRef.current.src = imageSrc;
-        const file = new File([dataURItoBlob(imageSrc)], `${new Date().getTime()}.png`, {
+        const customfile = new File([dataURItoBlob(imageSrc)], `${new Date().getTime()}.png`, {
             type: "image/png"
         });
-        console.log(file)
-        setPlay((p) => !p);
+        setfile(customfile);
     }, [webcamRef]);
+
+    const toogleCamera = () => {
+        setfile(null);
+        imageRef.current.src = perfil;
+        setPlay(!play)
+    }
+
+    const OnSubmit = (e) => {
+        e.preventDefault();
+        let fileCompare = null;
+        const { file: fileInput } = Object.fromEntries(new FormData(e.target));
+
+        if (fileInput.size == 0 && file == null) {
+            alert("Falta una imagen para la validacion!!!");
+            return;
+        }
+
+        if (file == null) {
+            fileCompare = fileInput;
+        } else {
+            fileCompare = file;
+        }
+
+        compareFace(fileCompare, state.perfil, (ok, message) => {
+
+            if (!ok && message.length > 0) {
+                alert(message);
+                return;
+            }
+
+            if (!ok) console.log("Error Server Fails");
+
+        });
+    }
 
     return (
         <Animated animationIn="bounceInRight" animationInDuration={1000} isVisible={true}>
@@ -55,20 +92,22 @@ const FormImage = () => {
                     {play && <button onClick={capture} className="btn btn-xs">Capture</button>}
                 </div>
 
-                <form className={"p-2"}>
+                <form onSubmit={OnSubmit} className={"p-2"}>
                     <div className={"px-5"}>
                         <label className="label">
                             <small className="label-text">Image Perfile</small>
                         </label>
                         <div className={"grid grid-cols-4 gap-3 text-center"}>
-                            <input type="file" className="file-input file-input-sm col-span-3" />
+                            <input
+                                name={"file"}
+                                type="file"
+                                className="file-input file-input-sm col-span-3"
+                                accept={"image/*"}
+                            />
                             <div>
                                 <label className="label">
                                     <small className="label-text">camara</small>
-                                    <input type="checkbox" onChange={() => {
-                                        imageRef.current.src = perfil;
-                                        setPlay(!play)
-                                    }} checked={play} className="checkbox" />
+                                    <input type="checkbox" onChange={toogleCamera} checked={play} className="checkbox" />
                                 </label>
                             </div>
                         </div>
@@ -77,6 +116,7 @@ const FormImage = () => {
                     <div className={"px-4 mt-3"}>
                         <button className="btn  btn-sm btn-primary">Login</button>
                     </div>
+
                 </form>
 
             </div>
