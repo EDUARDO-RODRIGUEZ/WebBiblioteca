@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { Animated } from 'react-animated-css'
 import Webcam from "react-webcam";
-import perfil from  '../../../../assets/perfil.png';
+import perfil from '../../../../assets/perfil.png';
+import { dataURItoBlob } from '../../../../helpers/helper';
 
 const videoConstraints = {
     facingMode: "user"
@@ -18,27 +19,17 @@ const FormImage = () => {
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current.getScreenshot();
         imageRef.current.src = imageSrc;
-        const file = new File([dataURItoBlob(imageSrc)], "image.png", {
+        const file = new File([dataURItoBlob(imageSrc)], `${new Date().getTime()}.png`, {
             type: "image/png"
         });
+        console.log(file)
         setPlay((p) => !p);
     }, [webcamRef]);
-
-    function dataURItoBlob(dataURI) {
-        var byteString = atob(dataURI.split(",")[1]);
-        var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-        var ab = new ArrayBuffer(byteString.length);
-        var ia = new Uint8Array(ab);
-        for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        var blob = new Blob([ab], { type: mimeString });
-        return blob;
-    }
 
     return (
         <Animated animationIn="bounceInRight" animationInDuration={1000} isVisible={true}>
             <div>
+
                 <div className='flex justify-center' style={{ height: 200 }}>
                     {play &&
                         (
@@ -50,7 +41,6 @@ const FormImage = () => {
                                     screenshotFormat="image/jpeg"
                                     width={300}
                                     videoConstraints={videoConstraints}
-
                                 />
                             </div>
                         )
@@ -59,12 +49,12 @@ const FormImage = () => {
                     <div className={`${play ? "hidden" : "block"}`}>
                         <img height={300} ref={imageRef} src={perfil} alt={"image"} className={"h-full rounded-xl overflow-hidden "} />
                     </div>
-
                 </div>
 
                 <div className={"px-5 text-center mt-1"}>
                     {play && <button onClick={capture} className="btn btn-xs">Capture</button>}
                 </div>
+
                 <form className={"p-2"}>
                     <div className={"px-5"}>
                         <label className="label">
@@ -88,6 +78,7 @@ const FormImage = () => {
                         <button className="btn  btn-sm btn-primary">Login</button>
                     </div>
                 </form>
+
             </div>
         </Animated>
     )
