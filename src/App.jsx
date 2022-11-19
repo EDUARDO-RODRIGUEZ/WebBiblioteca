@@ -1,8 +1,11 @@
+import { UsuarioContextProvider } from './context/usuarioContext'
 import AppRoute from './routes/AppRoute'
 
 function App() {
   return (
-    <AppRoute />
+    <UsuarioContextProvider>
+      <AppRoute />
+    </UsuarioContextProvider>
   )
 }
 

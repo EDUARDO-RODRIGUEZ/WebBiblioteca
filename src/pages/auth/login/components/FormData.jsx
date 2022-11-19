@@ -1,16 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Animated } from 'react-animated-css';
+import { usuarioContext } from '../../../../context/usuarioContext';
 import useForm from '../../../../hooks/useForm';
 
 const FormData = (props) => {
 
     const { setstep } = props;
     const { value, onChange } = useForm({ email: "", password: "" });
+    const { login } = useContext(usuarioContext);
 
     function OnSubmit(e) {
         e.preventDefault();
-        console.log(value);
-        setstep((s) => s + 1);
+        login(value, (ok) => {
+            if (ok) setstep((s) => s + 1);
+        });
     }
 
     return (

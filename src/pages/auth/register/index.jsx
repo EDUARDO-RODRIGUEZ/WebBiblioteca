@@ -1,17 +1,23 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import svgwave from '../../../assets/wave.svg';
+import { usuarioContext } from '../../../context/usuarioContext';
 
 const Register = () => {
 
-  function OnSubmit(params) {
+  const { register } = useContext(usuarioContext);
 
+  function OnSubmit(e) {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target));
+    register(formData, (ok) => { });
   }
 
   return (
     <div className={"flex h-screen justify-center items-center"}>
       <div style={{ width: 450, minHeight: 360 }} className={"relative rounded-md shadow-2xl bg-white overflow-hidden"} >
         <div>
-          <form onSubmit={OnSubmit} className={"p-2"}>
+          <form onSubmit={OnSubmit} className={"p-2"} encType="multipart/form-data">
+
             <div>
               <h1 className={"text-xl text-center font-bold"}>Register</h1>
             </div>
@@ -24,6 +30,7 @@ const Register = () => {
                 type="text"
                 placeholder="nombre"
                 className="input input-sm w-full bg-theme-box"
+                name={"nombre"}
                 required
                 minLength={3}
               />
@@ -37,6 +44,7 @@ const Register = () => {
                 type="email"
                 placeholder="email"
                 className="input input-sm w-full bg-theme-box"
+                name={"email"}
                 required
               />
             </div>
@@ -48,9 +56,9 @@ const Register = () => {
               <input
                 type="password"
                 placeholder="********"
-                name={"password"}
                 className="input input-sm w-full bg-theme-box"
                 minLength={8}
+                name={"password"}
                 required
               />
             </div>
@@ -63,6 +71,7 @@ const Register = () => {
                 type="file"
                 className="file-input file-input-sm  w-full"
                 required
+                name={"perfil"}
                 accept="image/*"
               />
             </div>
@@ -79,6 +88,7 @@ const Register = () => {
         <div className='absolute bottom-0 w-full drop-shadow-2xl mt-1'>
           <img className={"object-cover h-20 w-full "} src={svgwave} alt="svg image" />
         </div>
+
       </div>
     </div>
   )
