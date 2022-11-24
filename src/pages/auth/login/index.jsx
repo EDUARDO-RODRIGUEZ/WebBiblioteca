@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import svgwave from '../../../assets/wave.svg';
-import useForm from '../../../hooks/useForm';
 import RenderStep from './components/RenderStep';
 
 const Login = () => {
-
+  
   const [step, setstep] = useState(0);
 
   return (

@@ -1,5 +1,7 @@
 import { createContext, useReducer } from "react";
 import { apiServiceAuth } from "../api/apiServiceAuth";
+import { apiServiceSuscription } from "../api/apiServiceSuscription";
+import { saveToken } from "../helpers/helper";
 import usuarioReducer from "../reducer/usuarioReducer";
 import { types } from "../types/types";
 
@@ -10,7 +12,10 @@ const initialState = {
   nombre: undefined,
   email: undefined,
   isAuthenticated: false,
-  perfil: undefined
+  perfil: undefined,
+  suscription: false,
+  fechaFin: undefined,
+  type: undefined
 }
 
 export const UsuarioContextProvider = ({ children }) => {
@@ -30,10 +35,25 @@ export const UsuarioContextProvider = ({ children }) => {
       }
 
       const usuario = data.data;
+      const typeUser = usuario.rol_id = 1 ? "client" : "admin";
+
+      const response = await apiServiceSuscription.get(`/suscriptor/active/${usuario.id}`);
+      const dataSuscription = response.data;
+
+      let fechaFin;
+      let suscription = false;
+      if (dataSuscription.ok && dataSuscription.data != null) {
+        fechaFin = dataSuscription.data.fechaFin;
+        suscription = true;
+      }
+
+      const payload = { id: usuario.id, nombre: usuario.nombre, email: usuario.email, perfil: usuario.perfil, type: typeUser, fechaFin, suscription };
+
       dispatch({
         type: types.UsuarioLogin,
-        payload: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, perfil: usuario.perfil }
+        payload
       });
+
       callback(true);
 
     } catch (error) {
@@ -86,6 +106,13 @@ export const UsuarioContextProvider = ({ children }) => {
         callback(false, "Face Invalid");
         return;
       }
+      
+      let token = {
+        ...state,
+        isAuthenticated: true
+      }
+
+      saveToken(token);
 
       dispatch({
         type: types.UsuarioLogin,
@@ -99,12 +126,20 @@ export const UsuarioContextProvider = ({ children }) => {
     }
   }
 
+  async function setContext(obj) {
+    dispatch({
+      type: types.UsuarioSet,
+      payload: obj
+    });
+  }
+
   return (
     <usuarioContext.Provider value={{
       state,
       login,
       register,
-      compareFace
+      compareFace,
+      setContext
     }}>
       {children}
     </usuarioContext.Provider>
