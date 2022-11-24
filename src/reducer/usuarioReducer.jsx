@@ -15,6 +15,12 @@ const usuarioReducer = (state, action) => {
                 perfil: action.payload.perfil,
                 isAuthenticated: true,
             }
+        case types.UsuarioSet:
+            return {
+                ...state,
+                ...action.payload
+            }
+            
         default:
             return state;
     }
